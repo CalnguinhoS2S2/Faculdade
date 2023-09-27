@@ -6,9 +6,8 @@ const int maxn=10;
 int main(){
     string instrucao;
     vector<string> vec[maxn], pipeline[maxn];
-    map<int, string>mp;
+    vector<string>mp={"IF","ID","EX","MEM","WB","B"};
     memset(pipeline, '0', sizeof(pipeline));
-    mp[1]="IF";mp[2]="ID";mp[3]="EX";mp[4]="MEM";mp[5]="WB";mp[6]="B";
     int c=0, n=0;
     getline(cin, instrucao);
     while(instrucao.size()){
@@ -33,9 +32,29 @@ int main(){
         }
     }
     cout<<"------------------\n\n";
-    for(int i=0; i<n; i++){
-        for(int j=i+1; j<6; j++){
+    cout<<"PIPELINE: \n";//for(int i=0; i<6; i++) cout<<mp[i]<<" ";
+    cout<<"------------------\n\n";
+    for(int i=0; i<6; i++){
+        for(int j=0; j<5; j++){
             pipeline[i][j]=mp[j];
+        }
+    }
+    for(int i=1; i<n; i++){
+        int cc=0;
+        for(int j=i; j<n;){
+            pipeline[i][j]=mp[cc];
+            cc++;
+            if((vec[i-1][0]!="JUMP" || vec[i-1][0]!="JZ") &&((vec[i-1][1]==vec[i][j+1]) || (vec[i-1][1]==vec[i][j+2]))){
+                int k=j-1;
+                while(pipeline[i-1][k]!="WB"){
+                    pipeline[i][k]=mp[5];
+                    k++;
+                }
+            }
+            if(vec[i-1][0]=="JZ" || vec[i-1][0]=="JUMP"){
+                cout<<"HAZARD DE CONTROLE\n";
+                break;
+            }
         }
     }
 }
