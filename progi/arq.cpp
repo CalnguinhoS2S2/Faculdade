@@ -20,7 +20,6 @@ int main(){
                 for(int i=0; i<aux.size()-1; i++) aux2+=aux[i];
                 vec[c].push_back(aux2);
             } else vec[c].push_back(aux);
-
         }
         c++;n++;
         getline(cin, instrucao);
@@ -34,11 +33,13 @@ int main(){
     cout<<"------------------\n\n";
     cout<<"PIPELINE: \n";//for(int i=0; i<6; i++) cout<<mp[i]<<" ";
     cout<<"------------------\n\n";
-    for(int i=0; i<6; i++){
+    for(int i=0; ; ){// eu n sei o pq q isso aqui n ta dando certo
         for(int j=0; j<5; j++){
             pipeline[i][j]=mp[j];
         }
     }
+    // esse for de cima ta certo mas por algum motivo estou acessando posição invalida na minha matriz ou no meu vetor;
+    string ajuda;
     for(int i=1; i<n; i++){
         int cc=0;
         for(int j=i; j<n;){
@@ -55,6 +56,15 @@ int main(){
                 cout<<"HAZARD DE CONTROLE\n";
                 break;
             }
+            if(vec[i-1][j]==vec[i][j+1] || vec[i-1][j]==vec[i][j+2]){
+                ajuda="HS";
+                int k=j;
+                while(pipeline[i-1][k]!="WB"){
+                    pipeline[i][k]=mp[5];
+                    k++;
+                }
+            }
         }
     }
+    if(ajuda=="HS")cout<<"HAZARD DE ESTRUTURA\n";
 }
