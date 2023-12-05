@@ -43,9 +43,9 @@ void loop(){
     umi = SEN11.humidity; // guardando o valor da umidade
     if(SEN11.read11(A1)!=-3){
       lcd.clear();
-      Serial.println("ERRO!!!");
+      Serial.println("DHT11 OFF");
       lcd.setCursor(0,0);
-      lcd.print("ERRO!!!");
+      lcd.print("DHT11 OFF");
       timer = millis();
     }else{
       // Exibe na serial o valor de umidade
