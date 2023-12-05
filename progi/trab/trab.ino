@@ -41,7 +41,8 @@ void loop(){
  
     temp = SEN11.temperature; // guardando o valor da temperatura
     umi = SEN11.humidity; // guardando o valor da umidade
-    if(temp==0 || umi==0){
+    if(SEN11.read11(A1)!=-3){
+      lcd.clear();
       Serial.println("ERRO!!!");
       lcd.setCursor(0,0);
       lcd.print("ERRO!!!");
