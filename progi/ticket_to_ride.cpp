@@ -1,10 +1,12 @@
 #include <bits/stdc++.h>
 
-#define sz(x) ((int)x.size())
+//#define sz(x) ((int)x.size())
 #define ff first
 #define ss second
 
 using namespace std;
+
+const int N = 15;
 
 //-----------------variaveis globais-----------------
 map<string, map<string, pair<int, string>>> conexoes;
@@ -12,7 +14,7 @@ map<string, map<string, pair<bool, string>>> visitado;
 map<string, int> dmao;
 set<string> ord;
 vector<string> city;
-set<char> carta_aberta;
+multiset<char> carta_aberta;
 stack<char> baralho, descarte;
 //---------------------------------------------------
 
@@ -35,7 +37,7 @@ struct jogador{
 };
 
 void vis(){
-	visitado["vancouver"]["calgary"] = {0," "};
+		visitado["vancouver"]["calgary"] = {0," "};
 	visitado["vancouver"]["seattle"] = {0," "};
 	visitado["seattle"]["vancouver"] = {0," "};
 	visitado["seattle"]["helena"] = {0," "};
@@ -146,6 +148,7 @@ void mapa(){
 }
 
 void aleatorizacao_das_cartas(){
+	
 	map<char, int> rad;
 		rad['c']=7; //coringa ou dorada
 		rad['V']=6; //verde
@@ -176,33 +179,93 @@ void aleatorizacao_das_cartas(){
 	}
 }
 
-void dfs(string i){
-	//vis[conexoes[i]]=1;
+
+int gera(string K) {
+	map<string, int> num;
+	vector<int> id(N), sz(N, 1);
+	iota(id.begin(), id.end(), 0);
+	vector<tuple<int, string, string, string>> edge;
+	for(auto x : visitado) {
+		for(auto [a, b] : visitado[x.first]) {	
+			if(b.second != K) continue;
+			edge.emplace_back(b.first, x.first, a, b.second);
+		}
+	}
+	function<int(int)> find = [&](int x) {
+		return (id[x] == x ? x : find(id[x]));
+	};
+	auto uni = [&](int x, int y) {
+		x = find(x), y = find(y);
+		if(x == y) return;
+		if(sz[x] > sz[y]) swap(x, y);
+		id[x] = y;
+		sz[y] += sz[x];
+	};
+	int cnt = 1;
+	sort(edge.begin(), edge.end());
+	vector<vector<pair<int, int>>> g(N);
+	for(auto [c, a, b, d] : edge) {
+		if(!num[a]) {
+			num[a] = cnt++;
+		}
+		if(!num[b]) {
+			num[b] = cnt++;
+		}
+		if(find(num[a]) != find(num[b])) {
+			uni(num[a], num[b]);
+			g[num[a]].emplace_back(num[b], c);
+			g[num[b]].emplace_back(num[a], c);
+		}
+	}
+	auto djk = [&](int u) {
+		const int inf = 1e9;
+		priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+		pq.emplace(0, u);
+		vector<int> dist(N + 10, -inf);
+		dist[u] = 0;
+		while(!pq.empty()) {
+			auto [a, b] = pq.top();
+			if(dist[b] > a) continue;
+			for(auto [k, w] : g[a]) {
+				if(dist[k] < w + dist[a]) {
+					dist[k] = w + dist[a];
+					pq.emplace(w + dist[a], k);
+				}
+			}
+		}
+		return *max_element(dist.begin(), dist.end());
+	};
+	int res = 0;
+	for(int i = 1; i < cnt; i++) {
+		res = max(res, djk(i));
+	}
+	return res;
+	
 }
 
-//~ void mesa(){
-	//~ int cont=0;
-	//~ for(auto x:carta_aberta){
-		//~ if(x=='c') cont++;
-	//~ }
-	//~ if(cont>=3){
-		//~ for(auto x:carta_aberta) descarte.push(x);
-		//~ for(auto x:carta_aberta) cout<<"\n---"<<x<<"---\n";
-		//~ carta_aberta.clear();
-		//~ cout<<"\n"<<(int)carta_aberta.size()<<"\n";
-		//~ while(carta_aberta.size()<6){
-			//~ carta_aberta.insert(baralho.top());
-			//~ baralho.pop();
-		//~ }
-	//~ }
-//~ }
 
-//~ void acabou_baralho(){
-	//~ stack<char> aux;
-	//~ while(!baralho.empty()){aux.push(baralho.top());baralho.pop();}
-	//~ while(!descarte.empty()){baralho.push(descarte.top());descarte.pop();}
-	//~ while(!aux.empty()){baralho.push(aux.top());aux.pop();}
-//~ }
+void dfs(string i){
+	
+}
+
+void mesa(){
+	if(carta_aberta.count('c')>=3){
+		for(auto x:carta_aberta) descarte.push(x);
+		carta_aberta.clear();
+		while(carta_aberta.size()<5){
+			carta_aberta.insert(baralho.top());
+			baralho.pop();
+		}
+	}
+}
+
+void acabou_baralho(){
+	stack<char> aux;
+	while(!baralho.empty()){aux.push(baralho.top());baralho.pop();}
+	while(!descarte.empty()){baralho.push(descarte.top());descarte.pop();}
+	while(!aux.empty()){baralho.push(aux.top());aux.pop();}
+}
+
 int main(){
 	mapa(); // função para criar o mapa do jogo
 	aleatorizacao_das_cartas(); // função para aleatorizar o baralho
@@ -216,6 +279,7 @@ int main(){
 	dmao["amarelo"]=7;
 	dmao["rosa"]=8;
 	jogador j1, j2; //criei um objeto na struct jogador
+	cout<<"Nome dos dois Jogadores: ";
 	cin>>j1.nome>>j2.nome; //nome dos jogadores
 	for(int i=0; i<15; i++){ // distribuindo cartas para os dois jogadores e colocando cartas na mesa de compra
 		char carta;
@@ -247,21 +311,22 @@ int main(){
 		if(i>9){ //colocando 5 cartas na mesa de compra
 			carta_aberta.insert(baralho.top());
 			baralho.pop();
-			//~ mesa();
+			mesa();
 		}
 	}
 	
 //-------------------jogo começa-------------------
-	while(j1.vagoes>5 || j2.vagoes>5){ //o jogo termina quando o numero de vagoes de um jogador for menor ou igual a 5
-		//~ if(baralho.size()<=10) acabou_baralho();
+	int tt=1;
+	while(tt--){ //o jogo termina quando o numero de vagoes de um jogador for menor ou igual a 5
+		if(baralho.size()<=10) acabou_baralho();
 		cout<<"cartas na mesa: ";
 		for(auto x:carta_aberta)cout<<x<<" ";
 		cout<<'\n';
-		cout<<j1.nome<<":\n";
+		cout<<j1.nome<<":  Vagoes:"<<j1.vagoes<<"\n";
 		cout<<"c V v b p l A a r\n";
 		for(auto x:j1.mao)cout<<x<<" ";
 		cout<<'\n';
-		cout<<j2.nome<<"\n";
+		cout<<j2.nome<<":  Vagoes:"<<j2.vagoes<<"\n";
 		cout<<"c V v b p l A a r\n";
 		for(auto x:j2.mao)cout<<x<<" ";
 		int opcao;
@@ -274,16 +339,20 @@ int main(){
 				}
 			}
 			cout<<'\n';
-			cout<<j1.nome<<":\n";
+			cout<<j1.nome<<":  Vagoes:"<<j1.vagoes<<"\n";
 			cout<<"c V v b p l A a r\n";
 			for(auto x:j1.mao)cout<<x<<" ";
 			cout<<'\n';
-			cout<<j2.nome<<";\n";
+			cout<<j2.nome<<":  Vagoes:"<<j2.vagoes<<"\n";
 			cout<<"c V v b p l A a r\n";
 			for(auto x:j2.mao)cout<<x<<" ";
 			cout<<'\n';
 			cout<<"Escolha onde ira colocar o vagao(os dois logais e a cor do logal): \n";
-			string l1, l2, cor;cin>>l1>>l2>>cor;
+			string l1, l2, cor;
+			cin.ignore();
+			getline(cin, l1);
+			getline(cin, l2);
+			cin>>cor;
 			if(cor=="cinza"){
 				string usar;
 				cout<<"Qual cartas ira usar para colocar no espaco: ";cin>>usar; //lembrando que as conexoes cinzas pode ser usada por qualquer carta, respeitando a regra de que é necessario ter o numero do custo para colocar em tal espaço 
@@ -292,7 +361,7 @@ int main(){
 						//essa conexao existe
 						if(!visitado[l1][l2].ff){ //vejo se essa conexao ja não foi usada
 							j1.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
-							visitado[l1][l2] = {1, j1.nome}; //coloco essa conexao para o jogador 1
+							visitado[l1][l2] = {0, j1.nome}; //coloco essa conexao para o jogador 1
 							j1.mao[dmao[usar]] -= conexoes[l1][l2].ff;
 						}
 					}
@@ -328,6 +397,15 @@ int main(){
 						}
 					}
 				}
+				cout<<'\n';
+				cout<<j1.nome<<":  Vagoes:"<<j1.vagoes<<"\n";
+				cout<<"c V v b p l A a r\n";
+				for(auto x:j1.mao)cout<<x<<" ";
+				cout<<'\n';
+				cout<<j2.nome<<":  Vagoes:"<<j2.vagoes<<"\n";
+				cout<<"c V v b p l A a r\n";
+				for(auto x:j2.mao)cout<<x<<" ";
+				cout<<'\n';
 			}
 			
 		}else if(opcao==2){
@@ -352,19 +430,19 @@ int main(){
 				cout<<'\n';
 				cout<<"Escolha uma carta dentre as que estao na mesa: ";
 				cin>>carta;
-				if(carta=='c') {j1.mao[0]++;carta_aberta.erase('c');}
-				if(carta=='V') {j1.mao[1]++;carta_aberta.erase('V');}
-				if(carta=='v') {j1.mao[2]++;carta_aberta.erase('v');}
-				if(carta=='b') {j1.mao[3]++;carta_aberta.erase('b');}
-				if(carta=='p') {j1.mao[4]++;carta_aberta.erase('p');}
-				if(carta=='l') {j1.mao[5]++;carta_aberta.erase('l');}
-				if(carta=='A') {j1.mao[6]++;carta_aberta.erase('A');}
-				if(carta=='a') {j1.mao[7]++;carta_aberta.erase('a');}
-				if(carta=='r') {j1.mao[8]++;carta_aberta.erase('r');}
+				if(carta=='c') {j1.mao[0]++;auto it=carta_aberta.find('c'); carta_aberta.erase(it);}
+				if(carta=='V') {j1.mao[1]++;auto it=carta_aberta.find('V'); carta_aberta.erase(it);}
+				if(carta=='v') {j1.mao[2]++;auto it=carta_aberta.find('v'); carta_aberta.erase(it);}
+				if(carta=='b') {j1.mao[3]++;auto it=carta_aberta.find('b'); carta_aberta.erase(it);}
+				if(carta=='p') {j1.mao[4]++;auto it=carta_aberta.find('p'); carta_aberta.erase(it);}
+				if(carta=='l') {j1.mao[5]++;auto it=carta_aberta.find('l'); carta_aberta.erase(it);}
+				if(carta=='A') {j1.mao[6]++;auto it=carta_aberta.find('A'); carta_aberta.erase(it);}
+				if(carta=='a') {j1.mao[7]++;auto it=carta_aberta.find('a'); carta_aberta.erase(it);}
+				if(carta=='r') {j1.mao[8]++;auto it=carta_aberta.find('r'); carta_aberta.erase(it);}
 				carta_aberta.insert(baralho.top());
 				baralho.pop();
-				//~ mesa();
-				cout<<"\ncartas na mesa: ";
+				mesa();
+				cout<<"cartas na mesa: ";
 				for(auto x:carta_aberta)cout<<x<<" ";
 				cout<<'\n';
 			}
@@ -378,11 +456,11 @@ int main(){
 				}
 			}
 			cout<<'\n';
-			cout<<j1.nome<<":\n";
+			cout<<j1.nome<<":  Vagoes:"<<j1.vagoes<<"\n";
 			cout<<"c V v b p l A a r\n";
 			for(auto x:j1.mao)cout<<x<<" ";
 			cout<<'\n';
-			cout<<j2.nome<<";\n";
+			cout<<j2.nome<<":  Vagoes:"<<j2.vagoes<<"\n";
 			cout<<"c V v b p l A a r\n";
 			for(auto x:j2.mao)cout<<x<<" ";
 			cout<<'\n';
@@ -396,7 +474,7 @@ int main(){
 						//essa conexao existe
 						if(!visitado[l1][l2].ff){ //vejo se essa conexao ja não foi usada
 							j1.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
-							visitado[l1][l2] = {1, j2.nome}; //coloco essa conexao para o jogador 1
+							visitado[l1][l2] = {0, j2.nome}; //coloco essa conexao para o jogador 1
 							j2.mao[dmao[usar]] -= conexoes[l1][l2].ff;
 						}
 					}
@@ -432,6 +510,15 @@ int main(){
 						}
 					}
 				}
+				cout<<'\n';
+				cout<<j1.nome<<":  Vagoes:"<<j1.vagoes<<"\n";
+				cout<<"c V v b p l A a r\n";
+				for(auto x:j1.mao)cout<<x<<" ";
+				cout<<'\n';
+				cout<<j2.nome<<":  Vagoes:"<<j2.vagoes<<"\n";
+				cout<<"c V v b p l A a r\n";
+				for(auto x:j2.mao)cout<<x<<" ";
+				cout<<'\n';
 			}
 			
 		}else if(opcao==2){
@@ -456,22 +543,33 @@ int main(){
 				cout<<'\n';
 				cout<<"Escolha uma carta dentre as que estao na mesa: ";
 				char carta;cin>>carta;
-				if(carta=='c') {j2.mao[0]++;carta_aberta.erase('c');}
-				if(carta=='V') {j2.mao[1]++;carta_aberta.erase('V');}
-				if(carta=='v') {j2.mao[2]++;carta_aberta.erase('v');}
-				if(carta=='b') {j2.mao[3]++;carta_aberta.erase('b');}
-				if(carta=='p') {j2.mao[4]++;carta_aberta.erase('p');}
-				if(carta=='l') {j2.mao[5]++;carta_aberta.erase('l');}
-				if(carta=='A') {j2.mao[6]++;carta_aberta.erase('A');}
-				if(carta=='a') {j2.mao[7]++;carta_aberta.erase('a');}
-				if(carta=='r') {j2.mao[8]++;carta_aberta.erase('r');}
+				if(carta=='c') {j2.mao[0]++;auto it=carta_aberta.find('c'); carta_aberta.erase(it);}
+				if(carta=='V') {j2.mao[1]++;auto it=carta_aberta.find('V'); carta_aberta.erase(it);}
+				if(carta=='v') {j2.mao[2]++;auto it=carta_aberta.find('v'); carta_aberta.erase(it);}
+				if(carta=='b') {j2.mao[3]++;auto it=carta_aberta.find('b'); carta_aberta.erase(it);}
+				if(carta=='p') {j2.mao[4]++;auto it=carta_aberta.find('p'); carta_aberta.erase(it);}
+				if(carta=='l') {j2.mao[5]++;auto it=carta_aberta.find('l'); carta_aberta.erase(it);}
+				if(carta=='A') {j2.mao[6]++;auto it=carta_aberta.find('A'); carta_aberta.erase(it);}
+				if(carta=='a') {j2.mao[7]++;auto it=carta_aberta.find('a'); carta_aberta.erase(it);}
+				if(carta=='r') {j2.mao[8]++;auto it=carta_aberta.find('r'); carta_aberta.erase(it);}
 				carta_aberta.insert(baralho.top());
 				baralho.pop();
-				//~ mesa();
-				cout<<"\ncartas na mesa: ";
+				mesa();
+				cout<<"cartas na mesa: ";
 				for(auto x:carta_aberta)cout<<x<<" ";
 				cout<<'\n';
 			}
 		}
 	}
+	//final do jogo
+	int maiorJ1, maiorJ2;
+	maiorJ1=gera(j1.nome);
+	maiorJ2=gera(j2.nome);
+	if(maiorJ1>maiorJ2) j1.pontos+=10;
+	else if(maiorJ2>maiorJ1){
+		j2.pontos+=10;
+	}
+	
+	if(j1.pontos>j2.pontos)cout<<j1.nome<<" WINS\n";
+	else cout<<j2.nome<<" WINS\n";
 }
