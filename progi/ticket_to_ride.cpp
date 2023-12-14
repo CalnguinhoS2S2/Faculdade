@@ -363,6 +363,12 @@ int main(){
 							j1.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
 							visitado[l1][l2] = {0, j1.nome}; //coloco essa conexao para o jogador 1
 							j1.mao[dmao[usar]] -= conexoes[l1][l2].ff;
+							if(conexoes[l1][l2].ff==1) j1.pontos+=1;
+							if(conexoes[l1][l2].ff==2) j1.pontos+=2;
+							if(conexoes[l1][l2].ff==3) j1.pontos+=4;
+							if(conexoes[l1][l2].ff==4) j1.pontos+=7;
+							if(conexoes[l1][l2].ff==5) j1.pontos+=10;
+							if(conexoes[l1][l2].ff==6) j1.pontos+=15;
 						}
 					}
 				}
@@ -381,7 +387,12 @@ int main(){
 								j1.mao[0] = num - j1.mao[0];
 								num = conexoes[l1][l2].ff - num;
 								j1.mao[dmao[cor]] -= num;
-								
+								if(conexoes[l1][l2].ff==1) j1.pontos+=1;
+								if(conexoes[l1][l2].ff==2) j1.pontos+=2;
+								if(conexoes[l1][l2].ff==3) j1.pontos+=4;
+								if(conexoes[l1][l2].ff==4) j1.pontos+=7;
+								if(conexoes[l1][l2].ff==5) j1.pontos+=10;
+								if(conexoes[l1][l2].ff==6) j1.pontos+=15;
 							}
 						}
 					}
@@ -393,6 +404,12 @@ int main(){
 								j1.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
 								visitado[l1][l2] = {1, j1.nome}; //coloco essa conexao para o jogador 1
 								j1.mao[dmao[conexoes[l1][l2].ss]] -= conexoes[l1][l2].ff;
+								if(conexoes[l1][l2].ff==1) j1.pontos+=1;
+								if(conexoes[l1][l2].ff==2) j1.pontos+=2;
+								if(conexoes[l1][l2].ff==3) j1.pontos+=4;
+								if(conexoes[l1][l2].ff==4) j1.pontos+=7;
+								if(conexoes[l1][l2].ff==5) j1.pontos+=10;
+								if(conexoes[l1][l2].ff==6) j1.pontos+=15;
 							}
 						}
 					}
@@ -473,9 +490,15 @@ int main(){
 					if(conexoes[l1].count(l2)){
 						//essa conexao existe
 						if(!visitado[l1][l2].ff){ //vejo se essa conexao ja não foi usada
-							j1.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
+							j2.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
 							visitado[l1][l2] = {0, j2.nome}; //coloco essa conexao para o jogador 1
 							j2.mao[dmao[usar]] -= conexoes[l1][l2].ff;
+							if(conexoes[l1][l2].ff==1) j2.pontos+=1;
+							if(conexoes[l1][l2].ff==2) j2.pontos+=2;
+							if(conexoes[l1][l2].ff==3) j2.pontos+=4;
+							if(conexoes[l1][l2].ff==4) j2.pontos+=7;
+							if(conexoes[l1][l2].ff==5) j2.pontos+=10;
+							if(conexoes[l1][l2].ff==6) j2.pontos+=15;
 						}
 					}
 				}
@@ -494,7 +517,12 @@ int main(){
 								j2.mao[0] = num - j2.mao[0];
 								num = conexoes[l1][l2].ff - num;
 								j2.mao[dmao[cor]] -= num;
-								
+								if(conexoes[l1][l2].ff==1) j2.pontos+=1;
+								if(conexoes[l1][l2].ff==2) j2.pontos+=2;
+								if(conexoes[l1][l2].ff==3) j2.pontos+=4;
+								if(conexoes[l1][l2].ff==4) j2.pontos+=7;
+								if(conexoes[l1][l2].ff==5) j2.pontos+=10;
+								if(conexoes[l1][l2].ff==6) j2.pontos+=15;
 							}
 						}
 					}
@@ -506,6 +534,12 @@ int main(){
 								j2.vagoes -= conexoes[l1][l2].ff; //tiro do jogador o custo para colocar os vagoes numa ferrovia
 								visitado[l1][l2] = {1, j2.nome}; //coloco essa conexao para o jogador 2
 								j2.mao[dmao[conexoes[l1][l2].ss]] -= conexoes[l1][l2].ff;
+								if(conexoes[l1][l2].ff==1) j2.pontos+=1;
+								if(conexoes[l1][l2].ff==2) j2.pontos+=2;
+								if(conexoes[l1][l2].ff==3) j2.pontos+=4;
+								if(conexoes[l1][l2].ff==4) j2.pontos+=7;
+								if(conexoes[l1][l2].ff==5) j2.pontos+=10;
+								if(conexoes[l1][l2].ff==6) j2.pontos+=15;
 							}
 						}
 					}
