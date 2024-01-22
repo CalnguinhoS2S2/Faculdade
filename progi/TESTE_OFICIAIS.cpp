@@ -7,7 +7,6 @@ using namespace std;
 const int maxn=1e5;
 
 vector<int> adj[maxn];
-vector<string> nodes;
 bool vis[maxn]={0};
 
 void dfs(int v){
@@ -29,16 +28,11 @@ int main(){
 			aux.push_back(i);
 		}
 		cin.ignore();
-		string nod;
-		getline(cin,nod);
-		while(sz(nod)){
-			stringstream ss(nod);
-			string token;
-			while(ss>>token){
-				nodes.push_back(token);
-				adj[token[1]-65].push_back(token[2]-65);
-			}
-			getline(cin, nod);
+		string token;
+		getline(cin,token);
+		while(sz(token)){
+			adj[token[1]-65].push_back(token[2]-65);
+			getline(cin,token);
 		}
 		for(auto x:aux){
 			if(!vis[x]){
