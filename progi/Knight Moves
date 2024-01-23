@@ -1,0 +1,31 @@
+#include <bits/stdc++.h>
+#define sz(x) ((int)x.size())
+#define ff first
+#define ss second
+using namespace std;
+
+const int maxn=10;
+
+// 2, 1, -1, -2, -2, -1, 1, 2
+// 1, 2, 2, 1, -1, -2, -2, -1
+bool mt[maxn][maxn]={0};
+int vi[]={2, 1, -1, -2, -2, -1, 1, 2}, vj[]={1, 2, 2, 1, -1, -2, -2, -1};
+
+void dfs(int x, int y){
+	mt[x][y]=1;
+	for(int i=0; i<8; )
+}
+
+int main(){
+	string xa;
+	while(getline(cin, xa)){
+		stringstream ss(xa);
+		string aux;
+		vector<string> token;
+		while(ss>>aux) token.push_back(aux);
+		int oi, oj, di, dj;
+		oi=token[0][0]-97;oj=token[0][1]-49;
+		di=token[1][0]-97;dj=token[1][1]-49;
+		dfs(oi, oj);
+	}
+}
