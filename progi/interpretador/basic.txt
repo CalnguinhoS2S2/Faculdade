@@ -1,10 +1,10 @@
-rem PROG. SOMATORIO
-rem ERICK LUCAS M. F. DA SILVA
-print "Digite N"
-S=0 : input N
-A=N
-if A<=0 goto 9
-S=S+A : A=A-1
-goto 6
-print N : print S
-HALT
+10 rem ERICK LUCAS
+20 rem PROG. SOMATORIO
+30 print "Digite N"
+40 S=0 : input N
+50 A=N
+60 if A<=0 goto 90
+70 S=S+A : A=A-1
+80 goto 60
+90 print N : print S
+100 HALT
