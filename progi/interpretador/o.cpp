@@ -1,151 +1,110 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define int long long
 #define ff first
 #define ss second
-const int MAXN=1e9;
-map<string, int> mp;
-vector<vector<string>> vt;
+
+stringstream b;
+vector<string> buffer;
+map<string, int> Label;
+vector<pair<string, int>> label;
 
 
-enum token_tipo(){
-	token_add, // soma
-	token_sub, // subtracao
-	token_mul, // multiplicacao
-	token_div, // divisao
-	token_EOF, // fim de arquivo
-	token_if, // se
-	token_var, // numero
-	token_name, //  nome var
-	token_goto, // goto
-	token_string, // texto entre aspas
-	token_print, // imprima
-	token_input, // leia
-	token_rec, // '='
-	token_rem, // comentario em basic
-	token_halt // comando halt
-	token_con // comando :
+void cria_label(){
+	int pos = 1;
+	label.push_back({buffer[0], 0});
+	while(buffer[pos]!="halt"){
+		if(buffer[pos]==";"){
+			pos++;
+			if(!Label.count(buffer[pos])){
+				Label[buffer[pos]] = pos;
+				label.push_back({buffer[pos], pos});
+			}
+		}
+		pos++;
+	}
 }
 
-struct Token{
-	token_tipo tipo;
-	string nometipo;
+void Print(int pos){
+	if(buffer[pos][0]=='"'){
+		string str = buffer[pos][0]=='"';
+		int i;
+		for(i=1; buffer[pos][i]!='"'; i++){
+			str += buffer[pos][i];
+		}
+		pos++;
+		cout<<str<<endl;
+	}else if(buffer[pos]==)
 }
 
-class Criacao_tokens{
-public:
-	string str;
-    size_t i;
-	Criacao_tokens(string &str):str(str), i(0) {}
-	Token nexttoken(){
-		while(i<str.size()&&str[i]==' ')i++;
-		if(i>str.size()) return {token_EOF, ""};
-		if(str.compare(i, 5, "print")==0){
-			i+=5;
-			return {token_print, "print"};
-		}
-		if(str.compare(i, 5, "input")){
-			i+=5;
-			return {token_input, "input"};
-		}
-		if(str[i]=='+'){
-			i++;
-			return {token_add, "+"};
-		}
-		if(str[i]=='-'){
-			i++;
-			return {token_sub, "-"};
-		}
-		if(str[i]=='*'){
-			i++;
-			return {token_mul, "*"};
-		}
-		if(str[i]=='/'){
-			i++;
-			return {token_div, "/"};
-		}
-		if(str[i]=='='){
-			i++;
-			return {token_rec, "="};
-		}
-		if(str.compare(i, 4, "goto")==0){
-			i+=4;
-			return {token_goto, "goto"};
-		}
-		if(str.compare(i, 2, "if")==0){
-			i+=2;
-			return {token_if, "if"};
-		}
-		if(isdigit(str[i])){
-			string aux;
-			while(i<str.size()&&isdigit(str[i])) aux+=str[i++];
-			return {token_var, aux};
-		}
-		if(isalpha(str[i])){
-			string aux;
-			while(i<str.size()&&isalpha(str[i])) aux+=str[i++];
-			return {token_name, aux};
-		}
-		if(str[i]=='"'){
-			string aux;
-			while(i<str.size()&&str[i]!='"') aux+=str[i++];
-			return {token_string, aux};
-		}
-		if(str.compare(i, 3, "rem")){
-			i+=3;
-			return {token_rem, "rem"};
-		}
-		if(str[i]==':'){
-			i++;
-			return {token_con, ":"};
+int  busca_goto(string tt){
+	int l=0, r=(int)label.size()-1, m ;
+	while(l<=r){
+		m=(l+r)/2;
+		if(tt==label[m].ff) return m;
+		if(tt<label[m].ff) r=m-1;
+		else l=m+1;
+	}
+	return -1;
+}
+
+int Goto(string tt){
+	sort(label.ss.begin(), label.ss.end());
+	int pos = busca_goto(tt);
+	return pos;
+}
+
+void interpretador(){
+	int pos = 0;
+	while(buffer[pos]!="halt"){
+		if(buffer[pos]=="rem") for(; buffer[pos]!=";" || buffer[pos]!=":"; pos++);
+		if(buffer[pos]==";")pos++;
+		if(buffer[pos]=="print") Prtint(pos++);
+		if(buffer[pos]=="goto"){
+			pos++;
+			int pp = Goto(buffer[pos]);
+			if(pp!=-1){
+				pos = pp;
+			}else break;
 		}
 	}
 }
 
-class interpretador{
-public:
-	void interpret(vector<vector<string>> &rts){
-		for(int i=0; i<vt.size(); i++){
-			for(int j=0; j<vt[i].size()){
-				if(vt[i][j]=="rem"){
-					for(int k=j+1; k<vt[i].size(); k++){
-						if(vt[i][k]==":"){
-							
-						}
+void leitura(string file){
+	ifstream a(file);
+	if(a.is_open()){
+		string linha;
+		while(getline(a, linha)){
+			string s, tot;
+			bool ok = 0;
+			stringstream aux(linha);
+			while(aux){
+				aux >> s;
+				if(s[0] == '"' or ok){
+					if(!tot.empty()){
+						tot += " ";
 					}
+					tot += s;
+					ok = 1;
+				} else{
+					buffer.push_back(s);
+				}
+				if(s.back() == '"'){
+					ok = 0;
+					if(!tot.empty())
+						buffer.push_back(tot);
+					tot.clear();
 				}
 			}
+			buffer.pop_back();
+			buffer.push_back(";");
 		}
-	}
-}
-
-void leitura(){
-	ifstream a(file);
-	if(!a.is_open()) cout<<"ERRO --> NAO ABRIU O ARQUIVO"<<endl;
-	stringstream b << a.rdbuf();
-	int tam=b.size();
-	vt=vector<vector<int>> (tam);
-	string aux;
-	int i=0, j=0;
-	while(b>>aux){
-		if(aux!=" "){
-			if(aux=="\n")i++; j=0;
-			else{
-				vt[i][j]=aux;
-				j++;
-			}
-		}
-	}
+		a.close();
+	}else cout<<"ERRO --> NAO ABRIU O ARQUIVO"<<endl;
 }
 
 signed main(){
 	string file = "basic.txt";
-	leitura();
-	interpretador inte;
-	for(int i=0; i<vt.size(); i++){
-		for(int j=0; j<vt[i].size(); j++){
-			inte.interpret(vt[i][j]);
-		}
-	}
+	leitura(file);
+	interpretador();
 }
