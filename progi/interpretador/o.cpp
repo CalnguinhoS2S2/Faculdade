@@ -1,76 +1,177 @@
 #include<bits/stdc++.h>
 using namespace std;
-
 #define ff first
 #define ss second
 
 stringstream b;
 vector<string> buffer;
 map<string, int> Label;
-vector<pair<string, int>> label;
+vector<pair<int, string>> label;
 
+struct tipo{
+	int type; //0, 1, 2 --> int, float, char
+	string valor; // valor a ser armazenado
+	tipo(){type = 0, valor = "";}
+	tipo(int a, string x){type = a, valor = x;}
+};
+map<string, tipo> var;
 
-void cria_label(){
+void cria_label(){ //certo
 	int pos = 1;
-	label.push_back({buffer[0], 0});
+	label.push_back({0, buffer[0]});
 	while(buffer[pos]!="halt"){
 		if(buffer[pos]==";"){
 			pos++;
 			if(!Label.count(buffer[pos])){
 				Label[buffer[pos]] = pos;
-				label.push_back({buffer[pos], pos});
+				label.push_back({pos, buffer[pos]});
 			}
 		}
 		pos++;
 	}
 }
 
-void Print(int pos){
+string print_var(int pos){
+	string aux = "";
+	for(int i=0; i<(int)buffer[pos].size(); i++) aux += buffer[pos][i];
+	if(!var.count(aux)){
+		cout<<"ERRO -> variavel nao existe"<<endl;
+		exit (0);
+	}
+	return var[aux].valor;
+}
+
+void Print(int pos){ //certo
 	if(buffer[pos][0]=='"'){
-		string str = buffer[pos][0]=='"';
+		char str = buffer[pos][0]=='"';
 		int i;
 		for(i=1; buffer[pos][i]!='"'; i++){
 			str += buffer[pos][i];
 		}
 		pos++;
 		cout<<str<<endl;
-	}else if(buffer[pos]==)
+	}else{
+		string var = print_var(pos);
+		cout<<var<<endl;
+	}
 }
 
-int  busca_goto(string tt){
+void input_var(string str){ //certo
+	if(!var.count(str)){
+		string variavel; cin>>variavel;
+		if(variavel.size()==1 && ((variavel[0] >= 'A' && variavel[0] >= 'Z') || (variavel[0] >= 'a' && variavel[0] >= 'z'))){
+			var[str].type = 2;
+			var[str].valor = variavel;
+		}
+		else{
+			bool ok = 0;
+			for(int i=0; i<(int)variavel.size(); i++)if(variavel[i]=='.')ok=true;
+			if(ok){
+				double aux = stod(variavel);
+				var[str].type = 1;
+				var[str].valor = aux;
+			}else{
+				int aux = stoi(variavel);
+				var[str].valor = aux;
+			}
+		}
+	} return ;
+}
+
+bool Input(int pos){ //certo
+	string aux = "";
+	for(int i=0; i<(int)buffer[pos].size(); i++) aux += buffer[pos][i];
+	if(!var.count(aux)){
+		input_var(aux);
+		return true;
+	}
+	return false;
+}
+
+int  busca_goto(string tt){ //certo
 	int l=0, r=(int)label.size()-1, m ;
 	while(l<=r){
 		m=(l+r)/2;
-		if(tt==label[m].ff) return m;
-		if(tt<label[m].ff) r=m-1;
+		if(tt==label[m].ss) return m;
+		if(tt<label[m].ss) r=m-1;
 		else l=m+1;
 	}
 	return -1;
 }
 
-int Goto(string tt){
-	sort(label.ss.begin(), label.ss.end());
+int Goto(string tt){ //certo
+	sort(label.begin(), label.end());
 	int pos = busca_goto(tt);
 	return pos;
+}
+
+bool IF(int pos){
+	
 }
 
 void interpretador(){
 	int pos = 0;
 	while(buffer[pos]!="halt"){
-		if(buffer[pos]=="rem") for(; buffer[pos]!=";" || buffer[pos]!=":"; pos++);
-		if(buffer[pos]==";")pos++;
-		if(buffer[pos]=="print") Prtint(pos++);
-		if(buffer[pos]=="goto"){
+		if(!Label.count(buffer[pos])){
+			cout<<"linha nao existe"<<endl;
+			exit(0);
+		}else pos++;
+		if(buffer[pos]=="rem") for(; buffer[pos]!=";" || buffer[pos]!=":"; pos++); // comentario
+		if(buffer[pos]==";" || buffer[pos]==":")pos++; // parada de linha ; ou outro comando em seguida :
+		if(buffer[pos]=="print") Print(pos++); // imprimir
+		if(buffer[pos]=="input"){ // ler
+			bool ok = Input(pos++);
+			if(!ok){
+				cout<<"ERRO->variavel ja existe"<<endl;
+				exit (0);
+			}
+		}
+		if(buffer[pos]=="goto"){ // jumper
 			pos++;
 			int pp = Goto(buffer[pos]);
 			if(pp!=-1){
 				pos = pp;
-			}else break;
+			}else exit (0);
+		}
+		if(buffer[pos]=="if"){
+			
+		}
+		string aux = "";
+		bool ok = false;
+		int i;
+		for(i=0; i<(int)buffer[pos].size() && !ok; i++){
+			aux +=buffer[pos][i];
+			if(buffer[pos][i]!='=') ok=true;
+		}
+		if(!var.count(aux)){ // varivel criada ou variavel criada inicializada
+			if(!ok){
+				var[aux] = tipo(0, "");
+			}else{
+				string uax = "";
+				bool okk = false;
+				for(int j=i+1; j<(int)buffer[pos].size(); i++){
+					uax += buffer[pos][j];
+					if(buffer[pos][j]=='.') okk = true;
+				}
+				if(uax.size()==1 && ((uax[0] >= 'A' && uax[0] >= 'Z') || (uax[0] >= 'a' && uax[0] >= 'z'))){
+					var[aux].type = 2;
+					var[aux].valor = uax;
+				}else if(!okk){
+					var[aux].type = 0;
+					var[aux].valor = uax;
+				}else{
+					var[aux].type = 1;
+					var[aux].valor = uax;
+				}
+			}
+			pos++
+		}else{
+			
 		}
 	}
 }
 
-void leitura(string file){
+void leitura(string file){ //certo
 	ifstream a(file);
 	if(a.is_open()){
 		string linha;
@@ -100,7 +201,10 @@ void leitura(string file){
 			buffer.push_back(";");
 		}
 		a.close();
-	}else cout<<"ERRO --> NAO ABRIU O ARQUIVO"<<endl;
+	}else{
+		cout<<"ERRO --> NAO ABRIU O ARQUIVO"<<endl;
+		exit (0);
+	}
 }
 
 signed main(){
