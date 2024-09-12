@@ -31,7 +31,7 @@ void cria_label(){ //certo
 	}
 }
 
-string print_var(int pos){
+string print_var(int pos){ //dar uma olhada
 	string aux = "";
 	for(int i=0; i<(int)buffer[pos].size(); i++) aux += buffer[pos][i];
 	if(!var.count(aux)){
@@ -106,7 +106,137 @@ int Goto(string tt){ //certo
 }
 
 bool IF(int pos){
-	
+	string a="", cond="", b="";
+	bool ok=false, okk=false;
+	int i, j, k;
+	for(i=0; buffer[pos][i]!='<'||buffer[pos][i]!='>'||buffer[pos][i]!='!'||buffer[pos][i]!='='; i++){
+		a+=buffer[pos][i];
+		if(buffer[pos][i]=='.') ok=true;
+	}
+	for(j=i; buffer[pos][j]=='<'||buffer[pos][j]=='>'||buffer[pos][j]=='!'||buffer[pos][j]=='='; j++) cond+=buffer[pos][j];
+	for(k=i; buffer[pos][k]=='<'||buffer[pos][k]=='>'||buffer[pos][k]=='!'||buffer[pos][k]=='='; j++){
+		b+=buffer[pos][k];
+		if(buffer[pos][k]=='.') okk=true;
+	}
+	if(var.count(a) && var.count(b)){
+		if(cond == ">"){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a>b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a>b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a>b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+		if(cond == "<"){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a<b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a<b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a<b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+		if(cond == ">="){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a>=b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a>=b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a>=b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+		if(cond == "<="){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a<=b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a<=b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a<=b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+		if(cond == "!="){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a!=b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a!=b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a!=b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+		if(cond == "=="){
+			int typeA = var[a].type, typeB = var[a].type;
+			if(typeA==0 && typeB==0){
+				int x = stoi(var[a].valor), y = stoi(var[b].valor);
+				if(a==b) return true;
+				return false;
+			}else if(typeA==1 && typeB==1){
+				double x = stod(var[a].valor), y = stod(var[b].valor);
+				if(a==b) return true;
+				return false;
+			}else if(typeA==2 && typeB==2){
+				char x = var[a].valor, y = var[b].valor;
+				if(a==b) return true;
+				return false; 
+			}else{
+				cout<<"Comparacao nao pode ser feita"<<endl;
+				exit(0);
+			}
+		}
+	}else{
+		cout<<"Uma das variaveis nao existe"<<endl;
+		exit(0);
+	}
 }
 
 void interpretador(){
@@ -134,7 +264,10 @@ void interpretador(){
 			}else exit (0);
 		}
 		if(buffer[pos]=="if"){
-			
+			pos++;
+			i(IF(pos)){
+				pos++;
+			}
 		}
 		string aux = "";
 		bool ok = false;
