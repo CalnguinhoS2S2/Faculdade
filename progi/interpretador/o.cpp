@@ -1,4 +1,38 @@
-#include<bits/stdc++.h>
+
+//~ ▀██▀─▄███▄─▀██─██▀██▀▀█
+//~ ─██─███─███─██─██─██▄█
+//~ ─██─▀██▄██▀─▀█▄█▀─██▀█
+//~ ▄██▄▄█▀▀▀─────▀──▄██▄▄█
+
+//~ —–-—▒▒▒▒▒▒▒▒▒▒
+//~ —–-▒███████████▒
+//~ —▒████▒▒▒▒▒▒▒███▒
+//~ -▒████▒▒▒▒▒▒▒▒▒███▒……………….▒▒▒▒▒▒
+//~ -▒███▒▒▒▒▒███▒▒▒███▒…………..▒██████▒
+//~ -▒███▒▒▒▒██████▒▒███▒……….▒██▒▒▒▒██▒
+//~ —▒███▒▒▒███████▒▒██▒…….▒███▒▒█▒▒██▒
+//~ —–▒███▒▒████████▒██▒…▒███▒▒███▒▒██▒
+//~ ——–▒██▒▒██████████▒▒███▒▒████▒▒██▒
+//~ ———▒██▒▒██████████████▒████▒▒██▒
+//~ ———-▒██▒▒█████████████████▒▒██▒
+//~ ————▒██▒▒██████████████▒▒██▒
+//~ ————–▒██▒▒████████████▒▒██▒
+//~ —————-▒██▒▒██████████▒▒██▒
+//~ —————–▒██▒▒████████▒▒██▒
+//~ ——————-▒██▒▒██████▒▒██▒
+//~ ———————▒██▒▒████▒▒██▒
+//~ ———————-▒██▒▒███▒▒█▒
+//~ ————————▒██▒▒█▒▒█▒
+//~ ————————-▒██▒▒▒█▒
+//~ —————————▒██▒█▒
+//~ —————————♥♥♥♥♥♥
+//~ —————————-♥♥♥♥♥
+//~ ——————————♥♥♥
+//~ —————————-—♥♥
+//~ ———————————♥
+
+
+#include <bits/stdc++.h>
 using namespace std;
 #define ff first
 #define ss second
@@ -62,17 +96,15 @@ void input_var(string str){ //certo
 		if(variavel.size()==1 && ((variavel[0] >= 'A' && variavel[0] >= 'Z') || (variavel[0] >= 'a' && variavel[0] >= 'z'))){
 			var[str].type = 2;
 			var[str].valor = variavel;
-		}
-		else{
+		}else{
 			bool ok = 0;
 			for(int i=0; i<(int)variavel.size(); i++)if(variavel[i]=='.')ok=true;
 			if(ok){
-				double aux = stod(variavel);
 				var[str].type = 1;
-				var[str].valor = aux;
+				var[str].valor = variavel;
 			}else{
-				int aux = stoi(variavel);
-				var[str].valor = aux;
+				var[str].type = 0;
+				var[str].valor = variavel;
 			}
 		}
 	} return ;
@@ -105,7 +137,7 @@ int Goto(string tt){ //certo
 	return pos;
 }
 
-bool IF(int pos){
+bool IF(int pos){ // certo
 	string a="", cond="", b="";
 	int i, j, k;
 	for(i=0; buffer[pos][i]!='<'||buffer[pos][i]!='>'||buffer[pos][i]!='!'||buffer[pos][i]!='='; i++){
@@ -473,8 +505,68 @@ bool IF(int pos){
 	return false;
 }
 
-void expressao(int pos){
-	
+void expressao(int pos, string str, int i){
+	int x=i+1;
+	string aux = "";
+	bool ok = false;
+	for(; (int)buffer[pos].size(); x++){
+		aux += buffer[pos][x];
+		if(buffer[pos][x]=='+'||buffer[pos][x]=='-')ok = true;
+	}
+	if(!ok){
+		if(!var.count(str)){ // se variavel n existe
+			if(var.count(aux)){ // A=N
+				var[str].type = var[aux].type;
+				var[str].valor = var[aux].valor;
+			}else{
+				if((int)aux.size()==0 && ((aux[0] >= 'A' && aux[0] >= 'Z') || (aux[0] >= 'a' && aux[0] >= 'z'))){
+					var[str].type = 2;
+					var[str].valor = str; 
+				}else{
+					bool okk=0;
+					for(int k=0; k<(int)aux.size(); k++) if(aux[k]=='.') okk = true;
+					if(!okk){
+						var[str].type = 0;
+						var[str].valor = aux;
+					}else{
+						var[str].type = 1;
+						var[str].valor = aux;
+					}
+				}
+			}
+		}else{ // se variavel existe
+			if(var.count(aux)){
+				var[str].valor = var[aux].valor;
+			}else{
+				if((int)aux.size()==0 && ((aux[0] >= 'A' && aux[0] >= 'Z') || (aux[0] >= 'a' && aux[0] >= 'z'))){
+					var[str].valor = aux; 
+				}else{
+					bool okk=0;
+					for(int k=0; k<(int)aux.size(); k++) if(aux[k]=='.') okk = true;
+					if(!okk){
+						var[str].valor = aux;
+					}else{
+						var[str].valor = aux;
+					}
+				}
+			}
+		}
+	}else{
+		int j = i+1;
+		vector<string> vt;
+		string ajd = "", a="";
+		for(; j<(int)aux.size()&&(aux[j]!=';'||aux[j]!=':'); j++){
+			if(aux[j]=='+'||aux[j]=='-'){
+				a+=aux[j];
+				vt.push_back(ajd);
+				vt.push_back(a);
+				ajd="", a="";
+			}else{
+				ajd +=aux[j];
+			}
+		}
+		vt.push_back(ajd);
+	}
 }
 
 void interpretador(){
@@ -516,7 +608,12 @@ void interpretador(){
 				}else if(buffer[pos]=="print"){
 					Print(pos++);
 				}else{
-					expressao(buffer[pos]);
+					string aux="";
+					int i;
+					for(i=0; buffer[pos][i]!='='; i++){
+						aux += buffer[pos][i];
+					}
+					expressao(pos, aux, i);
 					pos++;
 				}
 			}else{
@@ -528,16 +625,12 @@ void interpretador(){
 		string aux = "";
 		bool ok = false;
 		int i;
-		for(i=0; i<(int)buffer[pos].size() && !ok; i++){
+		for(i=0; !ok; i++){
 			if(buffer[pos][i]!='=') aux += buffer[pos][i];
 			if(buffer[pos][i]=='=') ok=true;
 		}
-		if(!ok && var.count(aux){
-			var[aux] = tipo(0, "");
-			pos++;
-		}else if(ok){
-			expressao(pos);
-			pos++;
+		if(ok){
+			expressao(pos, aux, i);
 		}
 		pos++;
 	}
