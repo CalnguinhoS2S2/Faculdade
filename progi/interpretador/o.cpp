@@ -505,7 +505,14 @@ bool IF(int pos){ // certo
 	return false;
 }
 
+string operacao(vector<string> vt, vector<int> p){
+	for(int i=0; i<(int)p.size(); i++){
+		
+	}
+}
+
 void expressao(int pos, string str, int i){
+	// estou olhando a expressao
 	int x=i+1;
 	string aux = "";
 	bool ok = false;
@@ -513,12 +520,12 @@ void expressao(int pos, string str, int i){
 		aux += buffer[pos][x];
 		if(buffer[pos][x]=='+'||buffer[pos][x]=='-')ok = true;
 	}
-	if(!ok){
-		if(!var.count(str)){ // se variavel n existe
-			if(var.count(aux)){ // A=N
+	if(!ok){ // se nao for uma expressao de soma ou subtracao
+		if(!var.count(str)){ // se variavel nao existe
+			if(var.count(aux)){ // A = N
 				var[str].type = var[aux].type;
 				var[str].valor = var[aux].valor;
-			}else{
+			}else{ //A = (qualquer atribuicao)
 				if((int)aux.size()==0 && ((aux[0] >= 'A' && aux[0] >= 'Z') || (aux[0] >= 'a' && aux[0] >= 'z'))){
 					var[str].type = 2;
 					var[str].valor = str; 
@@ -551,13 +558,15 @@ void expressao(int pos, string str, int i){
 				}
 			}
 		}
-	}else{
+	}else{ // se for uma expressao de soma ou subtracao
 		int j = i+1;
 		vector<string> vt;
+		vector<int> posicao;
 		string ajd = "", a="";
 		for(; j<(int)aux.size()&&(aux[j]!=';'||aux[j]!=':'); j++){
 			if(aux[j]=='+'||aux[j]=='-'){
 				a+=aux[j];
+				posicao.push_back(j);
 				vt.push_back(ajd);
 				vt.push_back(a);
 				ajd="", a="";
@@ -566,6 +575,8 @@ void expressao(int pos, string str, int i){
 			}
 		}
 		vt.push_back(ajd);
+		
+		string op = operacao(vt, posicao); 
 	}
 }
 
