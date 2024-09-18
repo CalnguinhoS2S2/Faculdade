@@ -77,7 +77,7 @@ string print_var(int pos){ //certo
 
 void Print(int pos){ //certo
 	if(buffer[pos][0]=='"'){
-		char str = buffer[pos][0]=='"';
+		string str ="";
 		int i;
 		for(i=1; buffer[pos][i]!='"'; i++){
 			str += buffer[pos][i];
@@ -86,7 +86,6 @@ void Print(int pos){ //certo
 		cout<<str<<endl;
 	}else{
 		string var = print_var(pos);
-		cout<<var<<endl;
 	}
 }
 
@@ -140,11 +139,11 @@ int Goto(string tt){ //certo
 bool IF(int pos){ // certo
 	string a="", cond="", b="";
 	int i, j, k;
-	for(i=0; buffer[pos][i]!='<'||buffer[pos][i]!='>'||buffer[pos][i]!='!'||buffer[pos][i]!='='; i++){
+	for(i=0; buffer[pos][i]!='<'&&buffer[pos][i]!='>'&&buffer[pos][i]!='!'&&buffer[pos][i]!='='; i++){
 		a+=buffer[pos][i];
 	}
 	for(j=i; buffer[pos][j]=='<'||buffer[pos][j]=='>'||buffer[pos][j]=='!'||buffer[pos][j]=='='; j++) cond+=buffer[pos][j];
-	for(k=j; buffer[pos][k]=='<'||buffer[pos][k]=='>'||buffer[pos][k]=='!'||buffer[pos][k]=='='; j++){
+	for(k=j; k<(int)buffer[pos].size(); k++){
 		b+=buffer[pos][k];
 	}
 	if(var.count(a) && var.count(b)){ // comparacao de duas variaveis
@@ -506,9 +505,179 @@ bool IF(int pos){ // certo
 }
 
 string operacao(vector<string> vt, vector<int> p){
-	for(int i=0; i<(int)p.size(); i++){
-		
+	string op;
+	if(var.count(vt[p[0]-1])&&!var.count(vt[p[0]+1])){ // A + 10
+		if(var[vt[p[0]-1]].type == 0){ // add sub int
+			int x = stoi(var[vt[p[0]-1]].valor), y = stoi(vt[p[0]+1]),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]-1]].type == 1){ // add sub float
+			double x = stod(var[vt[p[0]-1]].valor), y = stod(vt[p[0]+1]),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]-1]].type == 2){ // add float
+			string res;
+			if(vt[p[0]]=="+"){
+				res = var[vt[p[0]-1]].valor + vt[p[0]+1];
+			}else{
+				cout<<"Nao pode sub de CHAR";
+				exit(0);
+			}
+			op = res;
+		}
+	}else if(!var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // 10 + A
+		if(var[vt[p[0]+1]].type == 0){ // add sub int
+			int x = stoi(vt[p[0]-1]), y = stoi(var[vt[p[0]+1]].valor),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]+1]].type == 1){ // add sub float
+			double x = stod(vt[p[0]-1]), y = stod(var[vt[p[0]+1]].valor),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]+1]].type == 2){ // add CHAR
+			string res;
+			if(vt[p[0]]=="+"){
+				res = vt[p[0]-1] + var[vt[p[0]+1]].valor;
+			}else{
+				cout<<"Nao pode sub de CHAR";
+				exit(0);
+			}
+			op = res;
+		}
+	}else if(var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // A + B
+		if(var[vt[p[0]+1]].type == 0){ // add sub int
+			int x = stoi(var[vt[p[0]-1]].valor), y = stoi(var[vt[p[0]+1]].valor),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]+1]].type == 1){ // add sub float
+			double x = stod(var[vt[p[0]-1]].valor), y = stod(var[vt[p[0]+1]].valor),
+			res;
+			if(vt[p[0]]=="+"){
+				res = x + y;
+			}else{
+				res = x - y;
+			}
+			op = to_string(res);
+		}
+		if(var[vt[p[0]+1]].type == 2){ // add CHAR
+			string res;
+			if(vt[p[0]]=="+"){
+				res = var[vt[p[0]-1]].valor + var[vt[p[0]+1]].valor;
+			}else{
+				cout<<"Nao pode sub de CHAR";
+				exit(0);
+			}
+			op = res;
+		}
+	}else{ // 10 + 10
+		string x = vt[p[0]-1], y = vt[p[0]+1],
+		res;
+		if(x.size()==1 && y.size()==1){
+			if(vt[p[0]]=="+") res = x + y;
+			else{
+				cout<<"Nao pode sub de CHAR";
+				exit(0);
+			}
+			op = res;
+		}else{
+			bool ok = false, okk = false;
+			for(char i : x) if(i=='.') ok=true;
+			for(char i : y) if(i=='.') okk=true;
+			if(!ok && !ok){
+				int xx = stoi(x), yy = stoi(y),
+				res;
+				if (vt[p[0]]=="+") res = xx + yy;
+				else res = xx - yy;
+				op = to_string(res);
+			}else if(ok && okk){
+				double xx = stod(x), yy = stod(y),
+				res;
+				if(vt[p[0]]=="+") res = xx + yy;
+				else res = xx - yy;
+				op = to_string(res);
+			}
+		}
 	}
+	if(p.size()>1){
+		for(int i=1; i<(int)p.size(); i++){
+			if(var.count(vt[p[i]+1])){ // variavel
+				if(var[vt[p[i]+1]].type == 0){
+					int x = stoi(op), y = stoi(var[vt[p[i]+1]].valor),
+					res;
+					if(vt[p[i]]=="+") res = x + y;
+					else res = x - y;
+					op = to_string(res);
+				}else if(var[vt[p[i]+1]].type == 1){
+					double x = stod(op), y = stod(var[vt[p[i]+1]].valor),
+					res;
+					if(vt[p[i]]=="+") res = x + y;
+					else res = x - y;
+					op = to_string(res);
+				}else if(var[vt[p[i]+1]].type == 2){
+					string x = op, y = vt[p[i]+1],
+					res;
+					if(vt[p[i]]=="+") res = x + y;
+					else{
+						cout<<"Nao pode sub de CHAR";
+						exit(0);
+					}
+				}
+			}else{ // nao variavel
+				string aux = vt[p[i]+1];
+				if(aux.size()==1){
+					string x = op, y = vt[p[i]+1],
+					res;
+					res = x + y;
+					op = res;
+				}else{
+					bool ok = false;
+					for(char k:aux)if(k=='.') ok=true;
+					if(!ok){
+						int x = stoi(op), y = stoi(vt[p[i]+1]),
+						res;
+						res = x + y;
+						op = to_string(res);
+					}else{
+						double x = stod(op), y = stod(vt[p[i]+1]),
+						res;
+						res = x + y;
+						op = to_string(res);
+					}
+				}
+			}
+		}
+	}
+	return op;
 }
 
 void expressao(int pos, string str, int i){
@@ -642,6 +811,7 @@ void interpretador(){
 		}
 		if(ok){
 			expressao(pos, aux, i);
+			while(buffer[pos]!=";")pos++;
 		}
 		pos++;
 	}
@@ -686,5 +856,6 @@ void leitura(string file){ //certo
 signed main(){
 	string file = "basic.txt";
 	leitura(file);
+	cria_label();
 	interpretador();
 }
