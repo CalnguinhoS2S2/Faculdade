@@ -41,6 +41,8 @@ stringstream b;
 vector<string> buffer;
 map<string, int> Label;
 vector<pair<int, string>> label;
+vector<string> vt;
+vector<int> p;
 
 struct tipo{
 	int type; //0, 1, 2 --> int, float, char
@@ -53,12 +55,14 @@ map<string, tipo> var;
 void cria_label(){ //certo
 	int pos = 1;
 	label.push_back({0, buffer[0]});
+	buffer[0] = "label";
 	while(buffer[pos]!="halt"){
 		if(buffer[pos]==";"){
 			pos++;
 			if(!Label.count(buffer[pos])){
 				Label[buffer[pos]] = pos;
 				label.push_back({pos, buffer[pos]});
+				buffer[pos] = "label";
 			}
 		}
 		pos++;
@@ -86,6 +90,7 @@ void Print(int pos){ //certo
 		cout<<str<<endl;
 	}else{
 		string var = print_var(pos);
+		cout<<var<<endl;
 	}
 }
 
@@ -123,7 +128,9 @@ int  busca_goto(string tt){ //certo
 	int l=0, r=(int)label.size()-1, m ;
 	while(l<=r){
 		m=(l+r)/2;
-		if(tt==label[m].ss) return m;
+		if(tt==label[m].ss){
+			return label[m].ff;
+		}
 		if(tt<label[m].ss) r=m-1;
 		else l=m+1;
 	}
@@ -261,9 +268,6 @@ bool IF(int pos){ // certo
 				exit(0);
 			}
 		}
-	}else{
-		cout<<"Uma das variaveis nao existe"<<endl;
-		exit(0);
 	}if(var.count(b) && !var.count(a)){ // se b variavel
 		if(cond == ">"){
 			int typeB = var[b].type;
@@ -379,9 +383,6 @@ bool IF(int pos){ // certo
 				exit(0);
 			}
 		}
-	}else{
-		cout<<"A variavel "<<b<<" nao existe"<<endl;
-		exit(0);
 	}if(var.count(a) && !var.count(b)){ // se a variavel
 		if(cond == ">"){
 			int typeA = var[a].type;
@@ -504,7 +505,7 @@ bool IF(int pos){ // certo
 	return false;
 }
 
-string operacao(vector<string> vt, vector<int> p){
+string operacao(){
 	string op;
 	if(var.count(vt[p[0]-1])&&!var.count(vt[p[0]+1])){ // A + 10
 		if(var[vt[p[0]-1]].type == 0){ // add sub int
@@ -516,6 +517,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]-1]].type == 1){ // add sub float
 			double x = stod(var[vt[p[0]-1]].valor), y = stod(vt[p[0]+1]),
@@ -526,6 +528,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]-1]].type == 2){ // add float
 			string res;
@@ -536,6 +539,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else if(!var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // 10 + A
 		if(var[vt[p[0]+1]].type == 0){ // add sub int
@@ -547,6 +551,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 1){ // add sub float
 			double x = stod(vt[p[0]-1]), y = stod(var[vt[p[0]+1]].valor),
@@ -557,6 +562,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 2){ // add CHAR
 			string res;
@@ -567,6 +573,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else if(var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // A + B
 		if(var[vt[p[0]+1]].type == 0){ // add sub int
@@ -578,6 +585,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 1){ // add sub float
 			double x = stod(var[vt[p[0]-1]].valor), y = stod(var[vt[p[0]+1]].valor),
@@ -588,6 +596,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 2){ // add CHAR
 			string res;
@@ -598,6 +607,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else{ // 10 + 10
 		string x = vt[p[0]-1], y = vt[p[0]+1],
@@ -609,6 +619,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}else{
 			bool ok = false, okk = false;
 			for(char i : x) if(i=='.') ok=true;
@@ -618,13 +629,17 @@ string operacao(vector<string> vt, vector<int> p){
 				res;
 				if (vt[p[0]]=="+") res = xx + yy;
 				else res = xx - yy;
+				cout<<res<<endl;
 				op = to_string(res);
+				cout<<op<<endl;
+				return op;
 			}else if(ok && okk){
 				double xx = stod(x), yy = stod(y),
 				res;
 				if(vt[p[0]]=="+") res = xx + yy;
 				else res = xx - yy;
 				op = to_string(res);
+				return op;
 			}
 		}
 	}
@@ -637,12 +652,14 @@ string operacao(vector<string> vt, vector<int> p){
 					if(vt[p[i]]=="+") res = x + y;
 					else res = x - y;
 					op = to_string(res);
+					return op;
 				}else if(var[vt[p[i]+1]].type == 1){
 					double x = stod(op), y = stod(var[vt[p[i]+1]].valor),
 					res;
 					if(vt[p[i]]=="+") res = x + y;
 					else res = x - y;
 					op = to_string(res);
+					return op;
 				}else if(var[vt[p[i]+1]].type == 2){
 					string x = op, y = vt[p[i]+1],
 					res;
@@ -651,6 +668,8 @@ string operacao(vector<string> vt, vector<int> p){
 						cout<<"Nao pode sub de CHAR";
 						exit(0);
 					}
+					op = res;
+					return op;
 				}
 			}else{ // nao variavel
 				string aux = vt[p[i]+1];
@@ -659,6 +678,7 @@ string operacao(vector<string> vt, vector<int> p){
 					res;
 					res = x + y;
 					op = res;
+					return op;
 				}else{
 					bool ok = false;
 					for(char k:aux)if(k=='.') ok=true;
@@ -667,11 +687,13 @@ string operacao(vector<string> vt, vector<int> p){
 						res;
 						res = x + y;
 						op = to_string(res);
+						return op;
 					}else{
 						double x = stod(op), y = stod(vt[p[i]+1]),
 						res;
 						res = x + y;
 						op = to_string(res);
+						return op;
 					}
 				}
 			}
@@ -682,10 +704,10 @@ string operacao(vector<string> vt, vector<int> p){
 
 void expressao(int pos, string str, int i){
 	// estou olhando a expressao
-	int x=i+1;
+	int x=i;
 	string aux = "";
 	bool ok = false;
-	for(; (int)buffer[pos].size(); x++){
+	for(; x<(int)buffer[pos].size(); x++){
 		aux += buffer[pos][x];
 		if(buffer[pos][x]=='+'||buffer[pos][x]=='-')ok = true;
 	}
@@ -697,7 +719,7 @@ void expressao(int pos, string str, int i){
 			}else{ //A = (qualquer atribuicao)
 				if((int)aux.size()==0 && ((aux[0] >= 'A' && aux[0] >= 'Z') || (aux[0] >= 'a' && aux[0] >= 'z'))){
 					var[str].type = 2;
-					var[str].valor = str; 
+					var[str].valor = aux; 
 				}else{
 					bool okk=0;
 					for(int k=0; k<(int)aux.size(); k++) if(aux[k]=='.') okk = true;
@@ -728,14 +750,12 @@ void expressao(int pos, string str, int i){
 			}
 		}
 	}else{ // se for uma expressao de soma ou subtracao
-		int j = i+1;
-		vector<string> vt;
-		vector<int> posicao;
+		int j = 0;
 		string ajd = "", a="";
-		for(; j<(int)aux.size()&&(aux[j]!=';'||aux[j]!=':'); j++){
+		for(; j<(int)aux.size(); j++){
 			if(aux[j]=='+'||aux[j]=='-'){
 				a+=aux[j];
-				posicao.push_back(j);
+				p.push_back(j-1);
 				vt.push_back(ajd);
 				vt.push_back(a);
 				ajd="", a="";
@@ -744,33 +764,42 @@ void expressao(int pos, string str, int i){
 			}
 		}
 		vt.push_back(ajd);
-		
-		string op = operacao(vt, posicao); 
+		string op = operacao();
+		var[str].valor = op;
 	}
 }
+
 
 void interpretador(){
 	int pos = 0;
 	while(buffer[pos]!="halt"){
-		if(buffer[pos]=="rem") for(; buffer[pos]!=";" || buffer[pos]!=":"; pos++); // comentario
-		if(buffer[pos]==";" || buffer[pos]==":")pos++; // parada de linha ; ou outro comando em seguida :
-		if(buffer[pos]=="print") Print(pos++); // imprimir
+		if(buffer[pos]==";"||buffer[pos]==":"||buffer[pos]=="label") pos++;
+		if(buffer[pos]=="rem") while(buffer[pos]!=";"&&buffer[pos]!=":") pos++;
+		if(buffer[pos]=="print"){ // imprimir
+			pos++;
+			Print(pos);
+			pos++;
+		}
 		if(buffer[pos]=="input"){ // ler
-			bool ok = Input(pos++);
+			pos++;
+			bool ok = Input(pos);
 			if(!ok){
 				cout<<"ERRO->variavel ja existe"<<endl;
 				exit (0);
 			}
+			pos++;
 		}
 		if(buffer[pos]=="goto"){ // jumper
 			pos++;
 			int pp = Goto(buffer[pos]);
 			if(pp!=-1){
 				pos = pp;
+				cout<<pos<<"--->"<<buffer[pos]<<endl;
 			}else{
 				cout<<"Impossivel acessar a linha "<<pos<<endl;
 				exit(0);
 			}
+			pos++;
 		}
 		if(buffer[pos]=="if"){
 			pos++;
@@ -802,20 +831,24 @@ void interpretador(){
 			}
 		}
 		// varivel criada ou variavel criada inicializada e calculo de expressao
-		string aux = "";
-		bool ok = false;
-		int i;
-		for(i=0; !ok; i++){
-			if(buffer[pos][i]!='=') aux += buffer[pos][i];
-			if(buffer[pos][i]=='=') ok=true;
-		}
-		if(ok){
-			expressao(pos, aux, i);
-			while(buffer[pos]!=";")pos++;
+		if(buffer[pos]!="goto"&&buffer[pos]!="if"&&buffer[pos]!="input"&&buffer[pos]!="rem"&&buffer[pos]!="label"&&buffer[pos]!="print"&&buffer[pos]!=";"&&buffer[pos]!=":"&&buffer[pos]!="halt"&&buffer[pos][0]!='"'){
+			string aux = "";
+			bool ok = false;
+			int j;
+			for(int i=0; buffer[pos][i]!='='; i++) aux += buffer[pos][i];
+			for(j=0; j<(int)buffer[pos].size()&&!ok; j++) if(buffer[pos][j]=='=') ok = true;
+			if(ok){
+				expressao(pos, aux, j);
+				while(buffer[pos]!=";")pos++;
+			}else{
+				cout<<"ERRO --> expressao nao existe"<<endl;
+				exit(0);
+			}
 		}
 		pos++;
 	}
 }
+
 
 void leitura(string file){ //certo
 	ifstream a(file);
