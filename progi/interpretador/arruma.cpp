@@ -7,6 +7,8 @@ stringstream b;
 vector<string> buffer;
 map<string, int> Label;
 vector<pair<int, string>> label;
+vector<string> vt;
+vector<int> p;
 
 struct tipo{
 	int type; //0, 1, 2 --> int, float, char
@@ -359,7 +361,7 @@ bool IF(int pos){ // certo
 				int x = stoi(var[a].valor);
 				cout<<"b "<<b<<endl;
 				int y = stoi(b);
-				cout<<"pintoasfsf\n";
+				cout<<"a>b"<<endl;
 				if(x>y) return true;
 				return false;
 			}else if(typeA==1){
@@ -477,7 +479,7 @@ bool IF(int pos){ // certo
 	return false;
 }
 
-string operacao(vector<string> vt, vector<int> p){
+string operacao(){
 	string op;
 	if(var.count(vt[p[0]-1])&&!var.count(vt[p[0]+1])){ // A + 10
 		if(var[vt[p[0]-1]].type == 0){ // add sub int
@@ -489,6 +491,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]-1]].type == 1){ // add sub float
 			double x = stod(var[vt[p[0]-1]].valor), y = stod(vt[p[0]+1]),
@@ -499,6 +502,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]-1]].type == 2){ // add float
 			string res;
@@ -509,6 +513,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else if(!var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // 10 + A
 		if(var[vt[p[0]+1]].type == 0){ // add sub int
@@ -520,6 +525,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 1){ // add sub float
 			double x = stod(vt[p[0]-1]), y = stod(var[vt[p[0]+1]].valor),
@@ -530,6 +536,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 2){ // add CHAR
 			string res;
@@ -540,6 +547,7 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else if(var.count(vt[p[0]-1])&&var.count(vt[p[0]+1])){ // A + B
 		if(var[vt[p[0]+1]].type == 0){ // add sub int
@@ -551,6 +559,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 1){ // add sub float
 			double x = stod(var[vt[p[0]-1]].valor), y = stod(var[vt[p[0]+1]].valor),
@@ -561,6 +570,7 @@ string operacao(vector<string> vt, vector<int> p){
 				res = x - y;
 			}
 			op = to_string(res);
+			return op;
 		}
 		if(var[vt[p[0]+1]].type == 2){ // add CHAR
 			string res;
@@ -571,10 +581,14 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}
 	}else{ // 10 + 10
+		cout<<"A soma e AKI"<<endl;
 		string x = vt[p[0]-1], y = vt[p[0]+1],
 		res;
+		cout<<"p: "<<p[0]<<endl;
+		cout<<x<<"<<->>"<<y<<endl;
 		if(x.size()==1 && y.size()==1){
 			if(vt[p[0]]=="+") res = x + y;
 			else{
@@ -582,22 +596,28 @@ string operacao(vector<string> vt, vector<int> p){
 				exit(0);
 			}
 			op = res;
+			return op;
 		}else{
 			bool ok = false, okk = false;
 			for(char i : x) if(i=='.') ok=true;
 			for(char i : y) if(i=='.') okk=true;
 			if(!ok && !ok){
+				cout<<"to aki no int"<<endl;
 				int xx = stoi(x), yy = stoi(y),
 				res;
 				if (vt[p[0]]=="+") res = xx + yy;
 				else res = xx - yy;
+				cout<<res<<endl;
 				op = to_string(res);
+				cout<<op<<endl;
+				return op;
 			}else if(ok && okk){
 				double xx = stod(x), yy = stod(y),
 				res;
 				if(vt[p[0]]=="+") res = xx + yy;
 				else res = xx - yy;
 				op = to_string(res);
+				return op;
 			}
 		}
 	}
@@ -610,12 +630,14 @@ string operacao(vector<string> vt, vector<int> p){
 					if(vt[p[i]]=="+") res = x + y;
 					else res = x - y;
 					op = to_string(res);
+					return op;
 				}else if(var[vt[p[i]+1]].type == 1){
 					double x = stod(op), y = stod(var[vt[p[i]+1]].valor),
 					res;
 					if(vt[p[i]]=="+") res = x + y;
 					else res = x - y;
 					op = to_string(res);
+					return op;
 				}else if(var[vt[p[i]+1]].type == 2){
 					string x = op, y = vt[p[i]+1],
 					res;
@@ -624,6 +646,8 @@ string operacao(vector<string> vt, vector<int> p){
 						cout<<"Nao pode sub de CHAR";
 						exit(0);
 					}
+					op = res;
+					return op;
 				}
 			}else{ // nao variavel
 				string aux = vt[p[i]+1];
@@ -632,6 +656,7 @@ string operacao(vector<string> vt, vector<int> p){
 					res;
 					res = x + y;
 					op = res;
+					return op;
 				}else{
 					bool ok = false;
 					for(char k:aux)if(k=='.') ok=true;
@@ -640,11 +665,13 @@ string operacao(vector<string> vt, vector<int> p){
 						res;
 						res = x + y;
 						op = to_string(res);
+						return op;
 					}else{
 						double x = stod(op), y = stod(vt[p[i]+1]),
 						res;
 						res = x + y;
 						op = to_string(res);
+						return op;
 					}
 				}
 			}
@@ -654,15 +681,18 @@ string operacao(vector<string> vt, vector<int> p){
 }
 
 void expressao(int pos, string str, int i){
+	cout<<"estout AKI agr"<<endl;
 	// estou olhando a expressao
-	int x=i+1;
+	int x=i;
 	string aux = "";
 	bool ok = false;
-	for(; (int)buffer[pos].size(); x++){
+	for(; x<(int)buffer[pos].size(); x++){
 		aux += buffer[pos][x];
 		if(buffer[pos][x]=='+'||buffer[pos][x]=='-')ok = true;
 	}
+	cout<<aux<<endl;
 	if(!ok){ // se nao for uma expressao de soma ou subtracao
+		cout<<"01"<<endl;
 		if(!var.count(str)){ // se variavel nao existe
 			if(var.count(aux)){ // A = N
 				var[str].type = var[aux].type;
@@ -670,7 +700,7 @@ void expressao(int pos, string str, int i){
 			}else{ //A = (qualquer atribuicao)
 				if((int)aux.size()==0 && ((aux[0] >= 'A' && aux[0] >= 'Z') || (aux[0] >= 'a' && aux[0] >= 'z'))){
 					var[str].type = 2;
-					var[str].valor = str; 
+					var[str].valor = aux; 
 				}else{
 					bool okk=0;
 					for(int k=0; k<(int)aux.size(); k++) if(aux[k]=='.') okk = true;
@@ -701,26 +731,39 @@ void expressao(int pos, string str, int i){
 			}
 		}
 	}else{ // se for uma expressao de soma ou subtracao
-		int j = i+1;
-		vector<string> vt;
-		vector<int> posicao;
+		cout<<"02"<<endl;
+		int j = 0;
+		cout<<j<<endl;
 		string ajd = "", a="";
-		for(; j<(int)aux.size()&&(aux[j]!=';'||aux[j]!=':'); j++){
+		cout<<"filho: "<<aux<<endl;
+		cout<<aux[j]<<endl;
+		cout<<aux[j+1]<<endl<<endl;
+		for(; j<(int)aux.size(); j++){
+			cout<<"j: "<<j<<endl;
 			if(aux[j]=='+'||aux[j]=='-'){
 				a+=aux[j];
-				posicao.push_back(j);
+				cout<<"a: "<<a<<endl;
+				p.push_back(j-1);
 				vt.push_back(ajd);
 				vt.push_back(a);
 				ajd="", a="";
 			}else{
 				ajd +=aux[j];
+				cout<<"ajd: "<<ajd<<endl;
 			}
 		}
 		vt.push_back(ajd);
 		
-		string op = operacao(vt, posicao); 
+		cout<<"opa ESTOU AKIII"<<endl;
+		for(auto x:p)cout<<x<<" ";
+		cout<<endl;
+		for(auto x:vt)cout<<x<<" ";
+		cout<<endl;
+		string op = operacao();
+		var[str].valor = op;
 	}
 }
+
 
 void interpretador(){
 	int pos = 0;
@@ -730,7 +773,8 @@ void interpretador(){
 		if(buffer[pos]=="print"){ // imprimir
 			pos++;
 			cout<<buffer[pos]<<"<---"<<endl;
-			Print(pos); 
+			Print(pos);
+			pos++;
 		}
 		if(buffer[pos]=="input"){ // ler
 			pos++;
@@ -739,6 +783,7 @@ void interpretador(){
 				cout<<"ERRO->variavel ja existe"<<endl;
 				exit (0);
 			}
+			pos++;
 		}
 		if(buffer[pos]=="goto"){ // jumper
 			pos++;
@@ -751,6 +796,7 @@ void interpretador(){
 				cout<<"Impossivel acessar a linha "<<pos<<endl;
 				exit(0);
 			}
+			pos++;
 		}
 		if(buffer[pos]=="if"){
 			pos++;
@@ -767,29 +813,33 @@ void interpretador(){
 					}
 				}else if(buffer[pos]=="print"){
 					Print(pos++);
-				}//else{
-					//~ string aux="";
-					//~ int i;
-					//~ for(i=0; buffer[pos][i]!='='; i++){
-						//~ aux += buffer[pos][i];
-					//~ }
-					//~ expressao(pos, aux, i);
-					//~ pos++;
-				//~ }
+				}else{
+					string aux="";
+					int i;
+					for(i=0; buffer[pos][i]!='='; i++){
+						aux += buffer[pos][i];
+					}
+					expressao(pos, aux, i);
+					pos++;
+				}
 			}else{
 				while(buffer[pos]!=";") pos++;
 				pos++;
 			}
 		}
 		// varivel criada ou variavel criada inicializada e calculo de expressao
-		if(buffer[pos]!="goto"&&buffer[pos]!="if"&&buffer[pos]!="input"&&buffer[pos]!="rem"&&buffer[pos]!="label"&&buffer[pos]!="print"&&buffer[pos]!=";"&&buffer[pos]!=":"&&buffer[pos]!="halt"){
+		if(buffer[pos]!="goto"&&buffer[pos]!="if"&&buffer[pos]!="input"&&buffer[pos]!="rem"&&buffer[pos]!="label"&&buffer[pos]!="print"&&buffer[pos]!=";"&&buffer[pos]!=":"&&buffer[pos]!="halt"&&buffer[pos][0]!='"'){
+			cout<<buffer[pos]<<"-->>"<<pos<<endl;
 			string aux = "";
 			bool ok = false;
 			int j;
-			cout<<buffer[pos]<<" oiss "<<pos<<endl;
-			for(int i=0; buffer[pos][i]!='='; i++) if(buffer[pos][i]!='=') aux += buffer[pos][i];
+			cout<<endl<<buffer[pos]<<" estou_AKI "<<pos<<endl;
+			for(int i=0; buffer[pos][i]!='='; i++) aux += buffer[pos][i];
 			for(j=0; j<(int)buffer[pos].size()&&!ok; j++) if(buffer[pos][j]=='=') ok = true;
 			if(ok){
+				cout<<"entreiii"<<endl;
+				cout<<pos<<" -> "<<aux<<" -> "<<buffer[pos][j-1]<<" -> "<<j-1<<endl;
+				cout<<buffer[pos][j]<<" -> "<<j<<endl;
 				expressao(pos, aux, j);
 				while(buffer[pos]!=";")pos++;
 			}else{
@@ -800,6 +850,7 @@ void interpretador(){
 		pos++;
 	}
 }
+
 
 void leitura(string file){ //certo
 	ifstream a(file);
