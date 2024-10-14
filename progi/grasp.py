@@ -1,9 +1,17 @@
 import random
 
 caixas = [] # itens dentro da minha caixa
-peso_caixa = 10 # capacidade maxima de uma caixa
-itens = [5, 7, 2, 9, 1, 3, 4, 6] # peso de cada item a ser empacotado
+itens = [] # peso de cada item a ser empacotado
 Num_interacao = 100 # numero maximo de interações
+
+#--------------ler arquivo------------
+peso_caixa = int(input()) # capacidade maxima de uma caixa
+while True:
+    item = input()
+    if item == "":
+        break
+    itens.append(int(item))
+#-------------------------------------
 
 def gula(itens):
     for item in itens: # andar por todos os itens
